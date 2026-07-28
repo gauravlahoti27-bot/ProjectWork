@@ -1,0 +1,87 @@
+/* =============================================================
+   Alumni Nexus AI — responsive.css
+   Breakpoints, mobile navigation, and grid collapses.
+   Load this LAST so it can override base layout.
+   ============================================================= */
+
+/* ---- Large desktop down (≤ 1080px) ---- */
+@media (max-width: 1080px) {
+  .hero .container { grid-template-columns: 1fr; gap: 40px; }
+  .hero-card { max-width: 460px; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .feature.wide { grid-column: span 2; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+
+/* ---- Tablet (≤ 900px) ---- */
+@media (max-width: 900px) {
+  .nav-links,
+  .nav-actions .btn-ghost { display: none; }
+  .nav-toggle { display: flex; }
+
+  /* Slide-down mobile menu panel */
+  .mobile-menu {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0; right: 0;
+    z-index: 99;
+    background: rgba(15,23,42,.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--c-border);
+    padding: 18px var(--gutter) 26px;
+    display: grid;
+    gap: 6px;
+    transform: translateY(-14px);
+    opacity: 0;
+    visibility: hidden;
+    transition: .32s var(--ease);
+  }
+  .mobile-menu.open { transform: translateY(0); opacity: 1; visibility: visible; }
+  .mobile-menu a {
+    padding: 13px 12px;
+    border-radius: 12px;
+    color: var(--c-text);
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
+  .mobile-menu a:hover { background: var(--c-surface); border-color: var(--c-border); }
+  .mobile-menu .btn { margin-top: 8px; }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .tst-grid { grid-template-columns: 1fr; }
+  .faq-wrap { grid-template-columns: 1fr; gap: 30px; }
+  .contact-panel { grid-template-columns: 1fr; }
+}
+
+/* Desktop keeps the mobile menu hidden entirely */
+@media (min-width: 901px) {
+  .mobile-menu { display: none; }
+}
+
+/* ---- Mobile (≤ 620px) ---- */
+@media (max-width: 620px) {
+  :root { --nav-h: 64px; }
+
+  .features-grid { grid-template-columns: 1fr; }
+  .feature.wide { grid-column: span 1; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+
+  .hero { min-height: auto; padding-top: calc(var(--nav-h) + 60px); }
+  .hero-cta { flex-direction: column; }
+  .hero-cta .btn { width: 100%; }
+
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+
+  .tl-item { grid-template-columns: 48px 1fr; gap: 16px; }
+  .timeline::before { left: 23px; }
+  .tl-node { width: 48px; height: 48px; font-size: 16px; }
+}
+
+/* ---- Small mobile (≤ 400px) ---- */
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .hero-trust { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
