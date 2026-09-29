@@ -35,6 +35,12 @@ python run.py
 
 Open http://127.0.0.1:5000
 
+## Notification testing
+
+The dashboard includes a **Test notification** button. It tests the notification delivery path without pretending that the Blinkit product is in stock. For safety, the backend endpoint is disabled by default. Temporarily set `ENABLE_TEST_NOTIFICATION=true` in the deployment environment, test it, then set it back to `false`.
+
+The test reports whether browser notifications and Telegram delivery are working. Browser notifications require permission in the browser. Telegram requires both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`.
+
 ## Demo
 
 1. Add a product.

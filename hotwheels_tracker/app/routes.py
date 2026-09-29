@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, render_template, request
 from .db import get_db
 from .providers import DemoProvider
 from .monitor import check_all_products
+from .notifications import send_telegram
 
 bp = Blueprint("main", __name__)
 
@@ -69,6 +70,42 @@ def demo_available(product_id):
 def demo_unavailable(product_id):
     DemoProvider.state[product_id] = "UNAVAILABLE"
     return jsonify({"ok": True, "status": "UNAVAILABLE"})
+
+@bp.post("/api/test-notification")
+def test_notification():
+    """Send a safe test notification without changing product availability."""
+    import os
+
+    if os.getenv("ENABLE_TEST_NOTIFICATION", "false").lower() not in {"1", "true", "yes", "on"}:
+        return jsonify({
+            "error": "Test notifications are disabled. Set ENABLE_TEST_NOTIFICATION=true to test them."
+        }), 403
+
+    conn = get_db()
+    product = conn.execute(
+        "SELECT * FROM products ORDER BY id ASC LIMIT 1"
+    ).fetchone()
+    conn.close()
+
+    name = product["name"] if product else "Hot Wheels test product"
+    url = product["product_url"] if product else "https://blinkit.com/prn/x/prid/1404276"
+
+    message = (
+        "🔔 Hot Wheels Drop Tracker test notification\n\n"
+        f"Notification delivery is working.\n"
+        f"Product: {name}\n"
+        f"Open: {url}"
+    )
+
+    telegram_configured = bool(os.getenv("TELEGRAM_BOT_TOKEN") and os.getenv("TELEGRAM_CHAT_ID"))
+    telegram_sent = send_telegram(message) if telegram_configured else False
+
+    return jsonify({
+        "ok": True,
+        "telegram_configured": telegram_configured,
+        "telegram_sent": telegram_sent,
+        "browser_message": f"Test notification: {name}",
+    })
 
 @bp.post("/api/check-now")
 def check_now():
