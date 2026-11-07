@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+{% set u = g.user %}
+<div class="page-head"><div><h1>My Profile</h1><p>Keep it fresh so alumni and recruiters can find you.</p></div>
+  <a class="btn btn-ghost btn-sm" href="{{ url_for('users.alumni_detail', user_id=u['id']) }}">Preview public profile</a></div>
+<div class="two-col">
+  <form class="card reveal" method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}" />
+    <div class="form-grid">
+      <div class="field"><label>Full name</label><input name="full_name" required value="{{ u['full_name'] }}" /></div>
+      <div class="field"><label>Email (cannot be changed)</label><input value="{{ u['email'] }}" disabled /></div>
+      <div class="field"><label>Branch</label><input name="branch" value="{{ u['branch'] }}" /></div>
+      <div class="field"><label>Graduation year</label><input name="graduation_year" type="number" min="1950" max="2040" value="{{ u['graduation_year'] or '' }}" /></div>
+      <div class="field"><label>Company</label><input name="company" value="{{ u['company'] }}" /></div>
+      <div class="field"><label>Designation</label><input name="designation" value="{{ u['designation'] }}" /></div>
+      <div class="field"><label>Location</label><input name="location" value="{{ u['location'] }}" /></div>
+      <div class="field"><label>Phone</label><input name="phone" value="{{ u['phone'] }}" /></div>
+      <div class="field full"><label>LinkedIn URL</label><input name="linkedin" value="{{ u['linkedin'] }}" placeholder="https://linkedin.com/in/…" /></div>
+      <div class="field full"><label>Skills (comma separated)</label><input name="skills" value="{{ u['skills'] }}" placeholder="python, react, product management" /></div>
+      <div class="field full"><label>Bio</label><textarea name="bio" maxlength="600">{{ u['bio'] }}</textarea></div>
+      <label class="check full"><input type="checkbox" name="open_to_mentor" {{ 'checked' if u['open_to_mentor'] }} /> I'm open to mentoring students and fellow alumni</label>
+    </div>
+    <button class="btn btn-primary" style="margin-top:20px">Save changes</button>
+  </form>
+  <div class="card reveal" style="align-self:start;text-align:center">
+    <span class="ava lg" style="margin:0 auto 14px">{{ u['full_name']|initials }}</span>
+    <h3>{{ u['full_name'] }}</h3><p class="muted">{{ u['designation'] or 'Add your designation' }}{% if u['company'] %} @ {{ u['company'] }}{% endif %}</p>
+    <div class="chips" style="justify-content:center"><span class="badge">{{ u['role']|capitalize }}</span>{% if u['open_to_mentor'] %}<span class="badge green">Mentor</span>{% endif %}</div>
+  </div>
+</div>
+{% endblock %}

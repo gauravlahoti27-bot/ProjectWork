@@ -1,0 +1,7 @@
+{% if pg.pages > 1 %}
+<div class="pager">
+  <a class="btn btn-ghost btn-sm {{ '' if pg.has_prev else 'disabled' }}" href="?{{ update_args(page=pg.page-1)|urlencode }}">← Prev</a>
+  <span>Page {{ pg.page }} of {{ pg.pages }}</span>
+  <a class="btn btn-ghost btn-sm {{ '' if pg.has_next else 'disabled' }}" href="?{{ update_args(page=pg.page+1)|urlencode }}">Next →</a>
+</div>
+{% endif %}

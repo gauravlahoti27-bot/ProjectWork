@@ -1,0 +1,22 @@
+{% extends "_auth_base.html" %}
+{% block title %}Join the network{% endblock %}
+{% block body %}
+<h1>Join the network</h1>
+<p class="muted">Create your account in less than a minute.</p>
+<form method="post">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}" />
+  <div class="field"><label>Full name</label><input name="full_name" required value="{{ form.get('full_name','') }}" /></div>
+  <div class="field"><label>Email</label><input name="email" type="email" required value="{{ form.get('email','') }}" /></div>
+  <div class="form-row">
+    <div class="field"><label>I am a</label><select name="role"><option value="alumni" {{ 'selected' if form.get('role')!='student' }}>Alumnus / Alumna</option><option value="student" {{ 'selected' if form.get('role')=='student' }}>Current student</option></select></div>
+    <div class="field"><label>Graduation year</label><input name="graduation_year" type="number" min="1950" max="2040" required value="{{ form.get('graduation_year','') }}" placeholder="2024" /></div>
+  </div>
+  <div class="field"><label>Branch</label><input name="branch" value="{{ form.get('branch','') }}" placeholder="e.g. Computer Engineering" /></div>
+  <div class="form-row">
+    <div class="field"><label>Password</label><input name="password" type="password" minlength="8" required autocomplete="new-password" /></div>
+    <div class="field"><label>Confirm</label><input name="confirm" type="password" minlength="8" required autocomplete="new-password" /></div>
+  </div>
+  <button class="btn btn-primary btn-block">Create account</button>
+</form>
+<p class="muted" style="margin-top:18px;text-align:center">Already a member? <a class="link" href="{{ url_for('auth.login') }}">Log in</a></p>
+{% endblock %}

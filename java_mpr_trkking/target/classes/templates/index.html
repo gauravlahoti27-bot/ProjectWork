@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrekMate — Smart Trek Planning & Budgeting</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: headerNav}"></div>
+
+    <main>
+        <!-- Hero Section -->
+        <section style="background: linear-gradient(rgba(8, 28, 21, 0.75), rgba(8, 28, 21, 0.85)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1600') center/cover; color: #fff; padding: 80px 0 90px; text-align: center;">
+            <div class="container" style="max-width: 850px;">
+                <span class="badge" style="background-color: var(--accent); color:#fff; font-size:0.85rem; padding:6px 14px; margin-bottom:16px;">
+                    Smart Trek Planning & Virtual Wallet
+                </span>
+                <h1 style="font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px;">
+                    Plan Your Dream Trek Within Your Exact Budget
+                </h1>
+                <p style="font-size: 1.2rem; color: #e2e8f0; margin-bottom: 35px; line-height: 1.6;">
+                    Discover Himalayan summits, customize thrilling add-on activities & facilities, calculate costs in real-time, and book seamlessly using demo virtual credits.
+                </p>
+                <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
+                    <a href="/recommendations" class="btn btn-accent btn-lg">🎯 Get Budget Recommendations</a>
+                    <a href="/treks" class="btn btn-outline btn-lg" style="color:#fff; border-color:#fff;">Browse All Treks</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Highlights Section -->
+        <section style="padding: 60px 0; background-color: #ffffff;">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 45px;">
+                    <h2 style="font-size: 2.2rem; color: var(--primary-dark); margin-bottom: 10px;">Core Project Highlights</h2>
+                    <p style="color: var(--text-muted); font-size: 1.05rem;">Four flagship engineering pillars powering TrekMate</p>
+                </div>
+
+                <div class="grid grid-cols-4">
+                    <div class="card" style="padding: 24px; text-align: center; border-top: 4px solid #2a9d8f;">
+                        <div style="font-size: 2.5rem; margin-bottom: 14px;">🎯</div>
+                        <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--primary);">Budget Recommendations</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">
+                            Input your total budget and group size to receive dynamically ranked trek options that maximize value without overspending.
+                        </p>
+                    </div>
+
+                    <div class="card" style="padding: 24px; text-align: center; border-top: 4px solid #e76f51;">
+                        <div style="font-size: 2.5rem; margin-bottom: 14px;">⚡</div>
+                        <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--primary);">Automatic Trip Costing</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">
+                            Dynamic real-time calculation combining base costs, per-person add-on activities (rafting, bungee) and group facilities.
+                        </p>
+                    </div>
+
+                    <div class="card" style="padding: 24px; text-align: center; border-top: 4px solid #f4a261;">
+                        <div style="font-size: 2.5rem; margin-bottom: 14px;">💳</div>
+                        <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--primary);">Virtual Wallet & Advice</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">
+                            Allocated demo credits for cashless booking, instant overdraft alerts, transaction histories, and cost-reduction suggestions.
+                        </p>
+                    </div>
+
+                    <div class="card" style="padding: 24px; text-align: center; border-top: 4px solid #264653;">
+                        <div style="font-size: 2.5rem; margin-bottom: 14px;">📅</div>
+                        <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--primary);">Host-Managed Bookings</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">
+                            Dedicated leader module to schedule dates, manage slots capacity, review requests, and approve or reject bookings with auto-refunds.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Treks Section -->
+        <section style="padding: 60px 0;">
+            <div class="container">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:30px;">
+                    <div>
+                        <h2 style="font-size: 2rem; color: var(--primary-dark);">Popular Trek Expeditions</h2>
+                        <p style="color: var(--text-muted);">Handpicked trails across Uttarakhand, Himachal, Ladakh and Western Ghats</p>
+                    </div>
+                    <a href="/treks" class="btn btn-outline">View All Treks &rarr;</a>
+                </div>
+
+                <div class="grid grid-cols-3">
+                    <div th:each="trek : ${featuredTreks}" class="card trek-card">
+                        <div class="trek-image-wrap">
+                            <img th:src="${trek.imageUrl}" th:alt="${trek.title}">
+                            <div class="trek-badge-overlay">
+                                <span class="badge" th:classappend="'badge-' + ${#strings.toLowerCase(trek.difficulty)}" th:text="${trek.difficulty}">Moderate</span>
+                            </div>
+                        </div>
+                        <div class="card-body" style="display:flex; flex-direction:column; flex:1;">
+                            <h3 style="font-size: 1.2rem; margin-bottom: 6px; color: var(--primary-dark);" th:text="${trek.title}">Trek Title</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 10px;">
+                                📍 <span th:text="${trek.destination + ', ' + trek.state}">Destination, State</span>
+                            </p>
+                            <p style="font-size: 0.9rem; color: #4b5563; line-height: 1.5; margin-bottom: 14px;"
+                               th:text="${#strings.abbreviate(trek.description, 110)}">
+                                Description snippet...
+                            </p>
+                            <div class="trek-meta">
+                                <span>⏱️ <strong th:text="${trek.durationFormatted}">6D / 5N</strong></span>
+                                <span>🏔️ <strong th:text="${trek.altitudeMeters + ' m'}">3,810 m</strong></span>
+                                <span>🏃 <strong th:text="${trek.fitnessLevel}">Beginner</strong></span>
+                            </div>
+                            <div class="trek-price-box">
+                                <div>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted); display:block;">Starting from</span>
+                                    <span class="price-amount" th:text="'₹' + ${#numbers.formatDecimal(trek.basePrice, 1, 'COMMA', 2, 'POINT')}">₹9,200.00</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);"> / person</span>
+                                </div>
+                                <a th:href="@{'/plan/' + ${trek.id}}" class="btn btn-accent btn-sm">Plan & Customize &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments/navbar :: footer}"></div>
+    <script th:src="@{/js/app.js}"></script>
+</body>
+</html>
+

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Treks & Destinations — TrekMate</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: headerNav}"></div>
+
+    <main>
+        <div class="container">
+            <!-- Header & Filter Bar -->
+            <div style="background-color:#ffffff; padding:28px; border-radius:var(--border-radius); border:1px solid var(--border-color); margin-bottom:35px; box-shadow:var(--shadow-sm);">
+                <div style="margin-bottom:20px;">
+                    <h1 style="font-size:2.2rem; color:var(--primary-dark);">Explore Available Treks</h1>
+                    <p style="color:var(--text-muted);">Choose your next summit, compare difficulty ratings and customize your expedition.</p>
+                </div>
+
+                <form th:action="@{/treks}" method="get" style="display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
+                    <div style="flex:2; min-width:240px;">
+                        <input type="text" name="search" th:value="${searchQuery}" class="form-control" placeholder="Search destination, state or trek name (e.g. Manali, Kedarkantha)...">
+                    </div>
+                    <div style="flex:1; min-width:180px;">
+                        <select name="difficulty" class="form-control">
+                            <option value="ALL" th:selected="${selectedDifficulty == null or selectedDifficulty == 'ALL'}">All Difficulties</option>
+                            <option value="Easy" th:selected="${selectedDifficulty == 'Easy'}">Easy</option>
+                            <option value="Moderate" th:selected="${selectedDifficulty == 'Moderate'}">Moderate</option>
+                            <option value="Challenging" th:selected="${selectedDifficulty == 'Challenging'}">Challenging</option>
+                            <option value="Difficult" th:selected="${selectedDifficulty == 'Difficult'}">Difficult</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">Filter Treks</button>
+                        <a href="/treks" class="btn btn-outline" style="margin-left:6px;">Reset</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Treks Grid -->
+            <div th:if="${#lists.isEmpty(treks)}" style="text-align:center; padding:60px 20px; background:#fff; border-radius:var(--border-radius);">
+                <span style="font-size:3rem;">🔍</span>
+                <h3 style="margin-top:12px; color:var(--text-main);">No treks found matching your search</h3>
+                <p style="color:var(--text-muted); margin-bottom:20px;">Try adjusting your keywords or clearing the difficulty filter.</p>
+                <a href="/treks" class="btn btn-primary">View All Treks</a>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(treks)}" class="grid grid-cols-3">
+                <div th:each="trek : ${treks}" class="card trek-card">
+                    <div class="trek-image-wrap">
+                        <img th:src="${trek.imageUrl}" th:alt="${trek.title}">
+                        <div class="trek-badge-overlay">
+                            <span class="badge" th:classappend="'badge-' + ${#strings.toLowerCase(trek.difficulty)}" th:text="${trek.difficulty}">Moderate</span>
+                        </div>
+                    </div>
+                    <div class="card-body" style="display:flex; flex-direction:column; flex:1;">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 6px; color: var(--primary-dark);" th:text="${trek.title}">Trek Title</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px;">
+                            📍 <span th:text="${trek.destination + ', ' + trek.state}">Destination, State</span>
+                        </p>
+                        <p style="font-size: 0.9rem; color: #4b5563; line-height: 1.5; margin-bottom: 16px;"
+                           th:text="${#strings.abbreviate(trek.description, 120)}">
+                            Description snippet...
+                        </p>
+
+                        <div class="trek-meta">
+                            <span>⏱️ <strong th:text="${trek.durationFormatted}">6D / 5N</strong></span>
+                            <span>🏔️ <strong th:text="${trek.altitudeMeters + ' m'}">3,810 m</strong></span>
+                            <span>🏃 <strong th:text="${trek.fitnessLevel}">Beginner</strong></span>
+                        </div>
+
+                        <div class="trek-price-box">
+                            <div>
+                                <span style="font-size: 0.75rem; color: var(--text-muted); display:block;">Base Cost</span>
+                                <span class="price-amount" th:text="'₹' + ${#numbers.formatDecimal(trek.basePrice, 1, 'COMMA', 2, 'POINT')}">₹9,200.00</span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">/ person</span>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <a th:href="@{'/treks/' + ${trek.id}}" class="btn btn-outline btn-sm">Details</a>
+                                <a th:href="@{'/plan/' + ${trek.id}}" class="btn btn-accent btn-sm">Plan &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/navbar :: footer}"></div>
+    <script th:src="@{/js/app.js}"></script>
+</body>
+</html>
+

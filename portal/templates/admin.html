@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Admin Panel</h1><p>Manage members and campaigns.</p></div></div>
+<div class="grid grid-4" style="margin-bottom:22px">
+  {% for k, label in [('users','Users'),('jobs','Jobs'),('events','Events'),('event_registrations','Registrations')] %}
+  <div class="card stat-tile"><div><div class="num">{{ counts[k] }}</div><div class="dim">{{ label }}</div></div></div>{% endfor %}
+</div>
+<div class="card reveal" style="margin-bottom:22px"><div class="card-head"><h2>Members</h2></div>
+  <div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Email</th><th>Batch</th><th>Role</th><th></th></tr></thead><tbody>
+  {% for u in users %}<tr><td><a class="link" href="{{ url_for('users.alumni_detail', user_id=u['id']) }}">{{ u['full_name'] }}</a></td><td class="muted">{{ u['email'] }}</td><td>{{ u['graduation_year'] or '—' }}</td>
+    <td>{% if u['id'] != g.user['id'] %}<form class="inline" method="post" action="{{ url_for('admin.set_role', user_id=u['id']) }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}" />
+      <select class="select" name="role" onchange="this.form.submit()" style="width:auto;padding:6px 10px">{% for r in ['student','alumni','admin'] %}<option {{ 'selected' if u['role']==r }}>{{ r }}</option>{% endfor %}</select></form>{% else %}<span class="badge">you · admin</span>{% endif %}</td>
+    <td>{% if u['id'] != g.user['id'] %}<form class="inline" method="post" action="{{ url_for('admin.delete_user', user_id=u['id']) }}" data-confirm="Delete {{ u['full_name'] }}? This cannot be undone."><input type="hidden" name="_csrf" value="{{ csrf_token() }}" /><button class="btn btn-danger btn-sm">Delete</button></form>{% endif %}</td></tr>{% endfor %}
+  </tbody></table></div></div>
+<div class="two-col"><div class="card reveal"><div class="card-head"><h2>Donation campaigns</h2></div>
+  {% for c in campaigns %}<div class="row-item"><div class="grow"><strong>{{ c['title'] }}</strong><div class="dim">{{ c['raised']|money }} / {{ c['goal_amount']|money }}</div></div>
+    <form class="inline" method="post" action="{{ url_for('admin.delete_campaign', cid=c['id']) }}" data-confirm="Delete campaign and its donation records?"><input type="hidden" name="_csrf" value="{{ csrf_token() }}" /><button class="btn btn-danger btn-sm">Delete</button></form></div>{% endfor %}</div>
+  <form class="card reveal" method="post" action="{{ url_for('admin.create_campaign') }}" style="display:grid;gap:14px;align-self:start"><h2 style="font-family:var(--font-display);font-size:18px">New campaign</h2>
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}" />
+    <div class="field"><label>Title</label><input name="title" required /></div>
+    <div class="field"><label>Goal (₹)</label><input name="goal_amount" type="number" min="1" required /></div>
+    <div class="field"><label>Description</label><textarea name="description"></textarea></div>
+    <button class="btn btn-primary">Create campaign</button></form></div>
+{% endblock %}

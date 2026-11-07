@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ err.code }}{% endblock %}
+{% block content %}
+<div class="error-page"><div>
+  <h1 class="text-grad">{{ err.code }}</h1>
+  <h2>{{ {400:'Bad request',403:'Access denied',404:'Page not found'}.get(err.code, 'Something went wrong') }}</h2>
+  <p class="muted" style="margin:10px 0 24px">{{ err.description }}</p>
+  <a class="btn btn-primary" href="{{ url_for('home') }}">Back to home</a>
+</div></div>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="headerNav" class="navbar">
+    <div class="container nav-container">
+        <a href="/" class="brand-logo">
+            <span>⛰️</span> TrekMate
+        </a>
+        <ul class="nav-menu">
+            <li><a href="/treks" class="nav-link">Explore Treks</a></li>
+            <li><a href="/recommendations" class="nav-link">Budget Recommender</a></li>
+            <li th:if="${session.currentUser != null and !session.currentUser.isHost()}">
+                <a href="/bookings/my" class="nav-link">My Bookings</a>
+            </li>
+            <li th:if="${session.currentUser != null and !session.currentUser.isHost()}">
+                <a href="/wallet" class="nav-link">Virtual Wallet</a>
+            </li>
+            <li th:if="${session.currentUser != null and session.currentUser.isHost()}">
+                <a href="/host/dashboard" class="nav-link" style="color: #f4a261; font-weight: 700;">Host Portal</a>
+            </li>
+        </ul>
+        <div class="nav-actions">
+            
+
+            <!-- Profile Info & Logout -->
+            <div th:if="${session.currentUser != null}" style="display:flex; align-items:center; gap:10px;">
+                <span class="user-profile-badge" th:text="${session.userName}">Aryan Sharma</span>
+                <a href="/logout" class="btn btn-sm btn-outline" style="color:#fff; border-color:rgba(255,255,255,0.4);">Logout</a>
+            </div>
+
+            <!-- If guest, show login & register -->
+            <div th:if="${session.currentUser == null}" style="display:flex; gap:8px;">
+                <a href="/login" class="btn btn-sm btn-outline" style="color:#fff; border-color:rgba(255,255,255,0.5);">Login</a>
+                <a href="/register" class="btn btn-sm btn-accent">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<footer th:fragment="footer" style="background-color: #081c15; color: #94a3b8; padding: 40px 0 20px; margin-top: 60px;">
+    <div class="container footer-content">
+        <div>
+            <h3 style="color:#fff; font-size:1.3rem; margin-bottom:12px;">⛰️ TrekMate</h3>
+            <p style="font-size:0.9rem; line-height:1.6; max-width:400px;">
+                An intelligent trek planning, automatic trip budgeting, virtual wallet transactions, and host-managed expedition platform for explorers and trek leaders.
+            </p>
+        </div>
+        <div>
+            <h4 style="color:#fff; margin-bottom:12px; font-size:1rem;">Quick Navigation</h4>
+            <ul style="list-style:none; line-height:2; font-size:0.9rem;">
+                <li><a href="/treks" style="color:#94a3b8;">Browse Treks</a></li>
+                <li><a href="/recommendations" style="color:#94a3b8;">Budget Recommendations</a></li>
+                <li><a href="/wallet" style="color:#94a3b8;">Virtual Wallet</a></li>
+                <li><a href="/host/dashboard" style="color:#94a3b8;">Host & Leader Login</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 style="color:#fff; margin-bottom:12px; font-size:1rem;">Academic Blueprint</h4>
+            <p style="font-size:0.85rem; line-height:1.6;">
+                Built with Java 17, Spring Boot, MySQL, HTML5, CSS3 & JavaScript.
+                Demonstrates clean OOP architecture, relational database modeling & real-time trip budgeting.
+            </p>
+        </div>
+    </div>
+    <div class="container footer-bottom">
+        <p>&copy; 2026 TrekMate Project. Built for 2nd Year Mini Project (MPR). All rights reserved.</p>
+    </div>
+</footer>
+</body>
+</html>
+

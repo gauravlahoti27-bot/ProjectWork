@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="hello reveal">
+  <h1>Hello, {{ g.user['full_name'].split()[0] }} 👋</h1>
+  <p class="muted" style="margin:6px 0 16px">Here's what's happening in your alumni network today.</p>
+  <div style="max-width:380px"><div class="dim" style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Profile completeness</span><span>{{ completeness }}%</span></div>
+    <div class="progress"><span data-w="{{ completeness }}" style="width:0"></span></div></div>
+  {% if completeness < 100 %}<a class="btn btn-primary btn-sm" style="margin-top:14px" href="{{ url_for('users.profile') }}">Complete your profile</a>{% endif %}
+</div>
+
+<div class="grid grid-4 reveal" style="margin-bottom:22px">
+  {% for ico, num, label in [('🎓', stats.alumni, 'Alumni'), ('💼', stats.jobs, 'Open jobs'), ('📅', stats.events, 'Upcoming events'), ('💝', stats.raised|money, 'Raised')] %}
+  <div class="card stat-tile"><div class="stat-ico">{{ ico }}</div><div><div class="num">{{ num }}</div><div class="dim">{{ label }}</div></div></div>
+  {% endfor %}
+</div>
+
+<div class="two-col">
+  <div class="grid">
+    <div class="card reveal">
+      <div class="card-head"><h2>Upcoming events</h2><a class="link" href="{{ url_for('events.event_page') }}">View all</a></div>
+      {% for e in upcoming %}
+      <div class="row-item">
+        <div class="datebox"><b>{{ e['event_date'][8:10] }}</b><span>{{ e['event_date']|pretty_date }}</span></div>
+        <div class="grow"><strong>{{ e['title'] }}</strong><div class="dim">{{ e['venue'] }} · {{ e['attendees'] }} going</div></div>
+        <form method="post" action="{{ url_for('events.toggle_registration', event_id=e['id']) }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}" />
+          <button class="btn btn-sm {{ 'btn-success' if e['registered'] else 'btn-primary' }}">{{ '✓ Going' if e['registered'] else 'Register' }}</button></form>
+      </div>
+      {% else %}<p class="muted">No upcoming events.</p>{% endfor %}
+    </div>
+    <div class="card reveal">
+      <div class="card-head"><h2>Latest jobs</h2><a class="link" href="{{ url_for('jobs.jobs_page') }}">Browse all</a></div>
+      {% for j in jobs %}
+      <div class="row-item"><div class="stat-ico">💼</div>
+        <div class="grow"><strong>{{ j['title'] }}</strong><div class="dim">{{ j['company'] }} · {{ j['location'] or 'Remote' }}</div></div>
+        <span class="badge">{{ j['job_type'] }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="card reveal">
+    <div class="card-head"><h2>Suggested connections</h2><a class="link" href="{{ url_for('users.directory') }}">Directory</a></div>
+    {% for p in suggestions %}
+    <a class="row-item" href="{{ url_for('users.alumni_detail', user_id=p['id']) }}">
+      <span class="ava">{{ p['full_name']|initials }}</span>
+      <div class="grow person-meta"><strong>{{ p['full_name'] }}</strong><div class="dim">{{ p['designation'] or p['role']|capitalize }}{% if p['company'] %} @ {{ p['company'] }}{% endif %}</div></div>
+      {% if p['open_to_mentor'] %}<span class="badge green">Mentor</span>{% endif %}
+    </a>
+    {% endfor %}
+    <a class="btn btn-ghost btn-block btn-sm" style="margin-top:14px" href="{{ url_for('chatbot.chatbot') }}">🤖 Ask the AI assistant</a>
+  </div>
+</div>
+{% endblock %}

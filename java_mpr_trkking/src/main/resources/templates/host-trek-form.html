@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit ? 'Edit Trek' : 'Add New Trek'} + ' — Host Portal | TrekMate'">Add/Edit Trek — TrekMate</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: headerNav}"></div>
+
+    <main>
+        <div class="container" style="max-width: 850px;">
+            <div style="margin-bottom: 24px;">
+                <a href="/host/treks" style="font-size:0.85rem; color:var(--text-muted);">&larr; Back to Trek List</a>
+                <h1 style="font-size:2rem; color:var(--primary-dark); margin-top:4px;"
+                    th:text="${isEdit ? 'Edit Trek: ' + trek.title : 'Create New Trek Package'}">
+                    Create New Trek Package
+                </h1>
+                <p style="color:var(--text-muted);">Configure expedition specifications, pricing and requirements.</p>
+            </div>
+
+            <div class="card" style="padding: 32px;">
+                <form th:action="@{/host/treks/save}" method="post" th:object="${trek}">
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="form-group">
+                        <label class="form-label">Trek Title *</label>
+                        <input type="text" th:field="*{title}" class="form-control" placeholder="e.g. Pin Parvati Pass Expedition" required>
+                    </div>
+
+                    <div class="grid grid-cols-2" style="gap:16px;">
+                        <div class="form-group">
+                            <label class="form-label">Destination / Base Camp *</label>
+                            <input type="text" th:field="*{destination}" class="form-control" placeholder="e.g. Manali, Spiti Valley" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State / Region *</label>
+                            <input type="text" th:field="*{state}" class="form-control" placeholder="e.g. Himachal Pradesh" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3" style="gap:16px;">
+                        <div class="form-group">
+                            <label class="form-label">Difficulty Level *</label>
+                            <select th:field="*{difficulty}" class="form-control" required>
+                                <option value="Easy">Easy</option>
+                                <option value="Moderate">Moderate</option>
+                                <option value="Challenging">Challenging</option>
+                                <option value="Difficult">Difficult</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Duration Days *</label>
+                            <input type="number" th:field="*{durationDays}" class="form-control" min="1" max="30" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Duration Nights *</label>
+                            <input type="number" th:field="*{durationNights}" class="form-control" min="0" max="30" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3" style="gap:16px;">
+                        <div class="form-group">
+                            <label class="form-label">Base Cost Per Person (₹) *</label>
+                            <input type="number" th:field="*{basePrice}" class="form-control" min="500" step="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Max Altitude (Meters)</label>
+                            <input type="number" th:field="*{altitudeMeters}" class="form-control" placeholder="e.g. 4200">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Fitness Level Required</label>
+                            <select th:field="*{fitnessLevel}" class="form-control">
+                                <option value="Beginner">Beginner</option>
+                                <option value="Average">Average</option>
+                                <option value="High">High</option>
+                                <option value="Expert">Expert</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2" style="gap:16px;">
+                        <div class="form-group">
+                            <label class="form-label">Best Season</label>
+                            <input type="text" th:field="*{bestSeason}" class="form-control" placeholder="e.g. May to October">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Cover Image URL</label>
+                            <input type="url" th:field="*{imageUrl}" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Detailed Description & Itinerary</label>
+                        <textarea th:field="*{description}" class="form-control" rows="5" placeholder="Day-by-day itinerary, highlights, inclusions..."></textarea>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px;">
+                        <a href="/host/treks" class="btn btn-outline">Cancel</a>
+                        <button type="submit" class="btn btn-accent">Save Trek Package</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/navbar :: footer}"></div>
+</body>
+</html>
+

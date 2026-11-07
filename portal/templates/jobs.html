@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Jobs{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Jobs &amp; Internships</h1><p>{{ pg.total }} opening{{ '' if pg.total == 1 else 's' }} shared by the community</p></div></div>
+
+{% if g.user['role'] in ('alumni','admin') %}
+<details class="create"><summary class="btn btn-primary">＋ Post a job</summary>
+  <form class="card" method="post" action="{{ url_for('jobs.create_job') }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}" />
+    <div class="form-grid">
+      <div class="field"><label>Job title *</label><input name="title" required /></div>
+      <div class="field"><label>Company *</label><input name="company" required /></div>
+      <div class="field"><label>Location</label><input name="location" placeholder="City or Remote" /></div>
+      <div class="field"><label>Type</label><select name="job_type">{% for t in job_types %}<option>{{ t }}</option>{% endfor %}</select></div>
+      <div class="field full"><label>Apply link</label><input name="apply_link" placeholder="https://…" /></div>
+      <div class="field full"><label>Description</label><textarea name="description"></textarea></div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:16px">Publish job</button>
+  </form></details>
+{% else %}<p class="dim" style="margin-bottom:16px">Only alumni can post jobs. Graduated? Update your role from your profile or ask an admin.</p>{% endif %}
+
+<form class="filters" method="get">
+  <input class="input grow" name="q" value="{{ f.q }}" placeholder="Search title, company or keyword…" />
+  <select class="select" name="type"><option value="">All types</option>{% for t in job_types %}<option {{ 'selected' if f.type == t }}>{{ t }}</option>{% endfor %}</select>
+  <input class="input" name="location" value="{{ f.location }}" placeholder="Location" style="min-width:120px" />
+  <button class="btn btn-primary btn-sm">Search</button>
+  {% if f.q or f.type or f.location %}<a class="btn btn-ghost btn-sm" href="{{ url_for('jobs.jobs_page') }}">Reset</a>{% endif %}
+</form>
+
+{% if jobs %}
+<div class="grid grid-3">
+  {% for j in jobs %}
+  <div class="card hover reveal" style="display:flex;flex-direction:column">
+    <div class="card-head" style="margin-bottom:8px"><span class="badge {{ 'amber' if j['job_type']=='Internship' else '' }}">{{ j['job_type'] }}</span><span class="dim">{{ j['created_at'][:10]|pretty_date }}</span></div>
+    <h3>{{ j['title'] }}</h3>
+    <p class="muted">{{ j['company'] }} · 📍 {{ j['location'] or 'Remote' }}</p>
+    <p class="muted" style="margin-top:10px;flex:1">{{ (j['description'] or '')[:140] }}{{ '…' if (j['description'] or '')|length > 140 }}</p>
+    <p class="dim" style="margin:12px 0">Posted by {{ j['poster_name'] or 'Admin' }}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      {% if j['apply_link'] %}<a class="btn btn-primary btn-sm" href="{{ j['apply_link'] }}" target="_blank" rel="noopener noreferrer">Apply ↗</a>
+      {% elif j['poster_name'] %}<a class="btn btn-primary btn-sm" href="{{ url_for('users.alumni_detail', user_id=j['posted_by']) }}">Contact poster</a>{% endif %}
+      {% if g.user['role']=='admin' or j['posted_by']==g.user['id'] %}
+      <form class="inline" method="post" action="{{ url_for('jobs.delete_job', job_id=j['id']) }}" data-confirm="Delete this job?"><input type="hidden" name="_csrf" value="{{ csrf_token() }}" /><button class="btn btn-danger btn-sm">Delete</button></form>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% include "_pager.html" %}
+{% else %}<div class="card empty"><div class="big">💼</div>No jobs found. Try different filters.</div>{% endif %}
+{% endblock %}

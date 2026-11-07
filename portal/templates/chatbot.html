@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}AI Assistant{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>AI Career Assistant</h1><p>{{ 'Powered by OpenAI with your portal data.' if ai_enabled else 'Searches jobs, mentors, events and more across the portal.' }}</p></div>
+  <button id="chat-clear" class="btn btn-ghost btn-sm" type="button">Clear chat</button></div>
+<div class="card chat">
+  <div class="chat-log" id="chat-log">
+    <div class="msg bot welcome">Hi {{ g.user['full_name'].split()[0] }}! 👋 I'm your Alumni AI Assistant. Ask me about jobs, mentors, events or how to improve your profile.</div>
+    {% for m in history %}<div class="msg {{ m['sender'] }}">{{ m['body'] }}</div>{% endfor %}
+  </div>
+  <div class="suggest">
+    {% for q in ['Show me internships', 'Find mentors in python', 'Upcoming events', 'How can I improve my profile?', 'Donation campaigns'] %}<button type="button" data-ask="{{ q }}">{{ q }}</button>{% endfor %}
+  </div>
+  <form class="chat-form" id="chat-form" autocomplete="off">
+    <input class="input" id="chat-input" maxlength="500" placeholder="Ask anything about the alumni network…" required />
+    <button class="btn btn-primary">Send</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>{% endblock %}

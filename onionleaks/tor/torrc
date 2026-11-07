@@ -1,0 +1,25 @@
+# OnionLeaks Tor configuration.
+# Tor is the ONLY way into the portal: the app binds to 127.0.0.1 and is never exposed directly.
+
+# Keep Tor's own footprint minimal. No SOCKS proxy is needed on the server side.
+SocksPort 0
+Log notice stdout
+# Never write a log file that could contain circuit timing information.
+SafeLogging 1
+
+# v3 onion service -> app on the loopback interface (or the "app" container in docker-compose).
+HiddenServiceDir /var/lib/tor/onionleaks
+HiddenServiceVersion 3
+HiddenServicePort 80 app:8080
+
+# Harden the service against descriptor-based enumeration and some traffic analysis.
+HiddenServiceNonAnonymousMode 0
+HiddenServiceSingleHopMode 0
+HiddenServiceMaxStreams 100
+HiddenServiceMaxStreamsCloseCircuit 1
+# Proof-of-work DoS defence (Tor >= 0.4.8). Harmless if the client does not support it.
+HiddenServicePoWDefensesEnabled 1
+
+# Optional: restrict the reviewer dashboard to client-authorised Tor Browsers only.
+# Create keys with `tor --keygen` style x25519 pairs and drop the .auth file into
+# /var/lib/tor/onionleaks/authorized_clients/ — see README.

@@ -1,0 +1,36 @@
+# docker compose up -d --build
+#
+# Two containers. "app" lives on an internal network with no route anywhere; only "tor" can reach it,
+# and tor is the only container with internet access (it needs it to publish the onion descriptor).
+# Nothing is published to the host: the portal is unreachable except as a .onion.
+#
+# Put the contents of keys/reviewer.pub (from KeyGenTool) in .env as PORTAL_REVIEWER_PUBLIC_KEY.
+# Never put reviewer.key anywhere near this host.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORTAL_BIND: 0.0.0.0           # inside the container; the network is internal-only
+    volumes:
+      - portal-data:/app/data
+    networks: [onion]
+    # No "ports:" on purpose.
+
+  tor:
+    build: ./tor
+    restart: unless-stopped
+    volumes:
+      - tor-keys:/var/lib/tor        # persists the .onion address across restarts
+    depends_on: [app]
+    networks: [onion, egress]
+
+volumes:
+  portal-data:
+  tor-keys:
+
+networks:
+  onion:
+    internal: true                   # app <-> tor only
+  egress: {}                         # tor -> internet

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ person['full_name'] }}{% endblock %}
+{% block content %}
+<a class="link" href="{{ url_for('users.directory') }}">← Back to directory</a>
+<div class="card reveal" style="margin-top:16px">
+  <div class="profile-hero">
+    <span class="ava lg">{{ person['full_name']|initials }}</span>
+    <div style="flex:1;min-width:220px">
+      <h1 style="font-family:var(--font-display);font-size:30px">{{ person['full_name'] }}</h1>
+      <p class="muted">{{ person['designation'] or person['role']|capitalize }}{% if person['company'] %} @ {{ person['company'] }}{% endif %}</p>
+      <div class="chips"><span class="badge">{{ person['role']|capitalize }}</span>{% if person['open_to_mentor'] %}<span class="badge green">Open to mentor</span>{% endif %}</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn btn-primary" href="mailto:{{ person['email'] }}">✉️ Email</a>
+      {% if person['linkedin'] %}<a class="btn btn-ghost" href="{{ person['linkedin'] }}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>{% endif %}
+    </div>
+  </div>
+</div>
+<div class="two-col" style="margin-top:20px">
+  <div class="card reveal"><h3>About</h3><p class="muted" style="margin-top:8px;white-space:pre-wrap">{{ person['bio'] or 'This member has not added a bio yet.' }}</p>
+    {% if person['skills'] %}<div class="chips">{% for s in person['skills']|skills %}<span class="chip">{{ s }}</span>{% endfor %}</div>{% endif %}
+    {% if jobs %}<h3 style="margin-top:24px">Jobs posted</h3>{% for j in jobs %}<div class="row-item"><div class="grow"><strong>{{ j['title'] }}</strong><div class="dim">{{ j['company'] }} · {{ j['location'] }}</div></div></div>{% endfor %}{% endif %}</div>
+  <div class="card reveal"><h3 style="margin-bottom:12px">Details</h3>
+    <dl class="kv"><dt>Batch</dt><dd>{{ person['graduation_year'] or '—' }}</dd><dt>Branch</dt><dd>{{ person['branch'] or '—' }}</dd>
+      <dt>Location</dt><dd>{{ person['location'] or '—' }}</dd><dt>Company</dt><dd>{{ person['company'] or '—' }}</dd>
+      <dt>Member since</dt><dd>{{ person['created_at'][:10]|pretty_date }}</dd></dl></div>
+</div>
+{% endblock %}

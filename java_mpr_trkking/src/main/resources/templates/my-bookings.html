@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings — TrekMate</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: headerNav}"></div>
+
+    <main>
+        <div class="container">
+            <!-- Header -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:28px;">
+                <div>
+                    <span class="badge" style="background:#e0f2fe; color:#0369a1; margin-bottom:6px;">Booking Module</span>
+                    <h1 style="font-size:2.2rem; color:var(--primary-dark);">My Expedition Bookings</h1>
+                    <p style="color:var(--text-muted);">Track your booking requests, approval status and itinerary details.</p>
+                </div>
+                <div class="wallet-badge" style="background:var(--primary); font-size:1rem; padding:8px 18px;">
+                    <span>💳 Credits:</span>
+                    <span th:text="'₹' + ${#numbers.formatDecimal(currentCredits, 1, 'COMMA', 2, 'POINT')}">₹25,000.00</span>
+                </div>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+            <!-- Upcoming / Active Bookings Section -->
+            <div class="card" style="padding: 28px; margin-bottom: 35px;">
+                <h3 style="font-size: 1.3rem; color: var(--primary-dark); margin-bottom: 16px;">
+                    Upcoming Expeditions & Active Requests
+                </h3>
+
+                <div th:if="${#lists.isEmpty(upcomingBookings)}" style="text-align:center; padding:30px; color:var(--text-muted);">
+                    <p>You have no active or upcoming bookings right now.</p>
+                    <a href="/treks" class="btn btn-primary btn-sm" style="margin-top:10px;">Explore Treks Now</a>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(upcomingBookings)}" class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Booking Code</th>
+                                <th>Trek Destination</th>
+                                <th>Batch Dates</th>
+                                <th>Group</th>
+                                <th>Total Cost</th>
+                                <th>Status</th>
+                                <th>Host Feedback</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b : ${upcomingBookings}">
+                                <td><code style="font-weight:700;" th:text="${b.bookingCode}">TRK-1024</code></td>
+                                <td>
+                                    <strong th:text="${b.trek.title}">Kedarkantha</strong><br>
+                                    <small style="color:var(--text-muted);" th:text="${b.trek.destination}">Uttarkashi</small>
+                                </td>
+                                <td>
+                                    <span th:text="${#temporals.format(b.trekDate.startDate, 'dd MMM yyyy')}">01 Nov</span>
+                                    to
+                                    <span th:text="${#temporals.format(b.trekDate.endDate, 'dd MMM yyyy')}">06 Nov</span>
+                                </td>
+                                <td th:text="${b.groupSize + ' trekkers'}">2 trekkers</td>
+                                <td>
+                                    <strong style="color:var(--primary);" th:text="'₹' + ${#numbers.formatDecimal(b.totalCost, 1, 'COMMA', 2, 'POINT')}">₹18,400.00</strong>
+                                </td>
+                                <td>
+                                    <span class="badge" th:classappend="'badge-' + ${#strings.toLowerCase(b.status)}" th:text="${b.status}">PENDING</span>
+                                </td>
+                                <td style="font-size:0.85rem; color:#4b5563;" th:text="${b.hostNotes != null ? b.hostNotes : 'Awaiting host review'}">
+                                    Awaiting review
+                                </td>
+                                <td>
+                                    <form th:action="@{'/bookings/' + ${b.id} + '/cancel'}" method="post" onsubmit="return confirm('Cancel this booking and refund ₹' + this.dataset.cost + ' to your virtual wallet?');"
+                                          th:data-cost="${b.totalCost}">
+                                        <button type="submit" class="btn btn-danger btn-sm">Cancel & Refund</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Past / Cancelled Bookings Section -->
+            <div class="card" style="padding: 28px;">
+                <h3 style="font-size: 1.3rem; color: var(--primary-dark); margin-bottom: 16px;">
+                    Previous & Inactive Bookings
+                </h3>
+
+                <div th:if="${#lists.isEmpty(pastBookings)}" style="text-align:center; padding:20px; color:var(--text-muted);">
+                    No past or cancelled bookings on record.
+                </div>
+
+                <div th:if="${!#lists.isEmpty(pastBookings)}" class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Booking Code</th>
+                                <th>Trek Title</th>
+                                <th>Dates</th>
+                                <th>Total Cost</th>
+                                <th>Status</th>
+                                <th>Resolution Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b : ${pastBookings}">
+                                <td><code th:text="${b.bookingCode}">TRK-1001</code></td>
+                                <td th:text="${b.trek.title}">Roopkund</td>
+                                <td th:text="${#temporals.format(b.trekDate.startDate, 'dd MMM yyyy')}">10 Oct 2026</td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(b.totalCost, 1, 'COMMA', 2, 'POINT')}">₹14,500.00</td>
+                                <td>
+                                    <span class="badge" th:classappend="'badge-' + ${#strings.toLowerCase(b.status)}" th:text="${b.status}">CANCELLED</span>
+                                </td>
+                                <td style="font-size:0.85rem; color:var(--text-muted);" th:text="${b.hostNotes}">
+                                    Refunded
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/navbar :: footer}"></div>
+</body>
+</html>
+

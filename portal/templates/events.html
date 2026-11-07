@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Events{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Events</h1><p>Reunions, workshops and meetups.</p></div>
+  <div style="display:flex;gap:8px"><a class="btn btn-sm {{ 'btn-primary' if show!='past' else 'btn-ghost' }}" href="?show=upcoming">Upcoming</a><a class="btn btn-sm {{ 'btn-primary' if show=='past' else 'btn-ghost' }}" href="?show=past">Past</a></div></div>
+
+{% if g.user['role'] in ('alumni','admin') %}
+<details class="create"><summary class="btn btn-primary">＋ Create event</summary>
+  <form class="card" method="post" action="{{ url_for('events.create_event') }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}" />
+    <div class="form-grid">
+      <div class="field"><label>Title *</label><input name="title" required /></div>
+      <div class="field"><label>Date *</label><input name="event_date" type="date" required /></div>
+      <div class="field"><label>Venue</label><input name="venue" /></div>
+      <div class="field"><label>Category</label><select name="category">{% for c in categories %}<option>{{ c }}</option>{% endfor %}</select></div>
+      <div class="field full"><label>Description</label><textarea name="description"></textarea></div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:16px">Create event</button>
+  </form></details>
+{% endif %}
+
+{% if events %}
+<div class="grid grid-2">
+  {% for e in events %}
+  <div class="card hover reveal" style="display:flex;gap:18px">
+    <div class="datebox"><b>{{ e['event_date'][8:10] }}</b><span>{{ ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][e['event_date'][5:7]|int] }}</span></div>
+    <div style="flex:1;min-width:0">
+      <div class="chips" style="margin:0 0 8px"><span class="badge">{{ e['category'] }}</span>
+        {% set d = days_until(e['event_date']) %}{% if d == 0 %}<span class="badge green">Today</span>{% elif 0 < d <= 7 %}<span class="badge amber">In {{ d }} day{{ 's' if d>1 }}</span>{% endif %}</div>
+      <h3>{{ e['title'] }}</h3>
+      <p class="dim">📍 {{ e['venue'] or 'TBA' }} · 👥 {{ e['attendees'] }} registered</p>
+      <p class="muted" style="margin:10px 0 14px">{{ e['description'] }}</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        {% if show != 'past' %}<form class="inline" method="post" action="{{ url_for('events.toggle_registration', event_id=e['id']) }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}" />
+          <button class="btn btn-sm {{ 'btn-success' if e['registered'] else 'btn-primary' }}">{{ '✓ Registered — cancel' if e['registered'] else 'Register' }}</button></form>
+        {% else %}<span class="badge">{{ 'You attended' if e['registered'] else 'Ended' }}</span>{% endif %}
+        {% if g.user['role']=='admin' or e['created_by']==g.user['id'] %}<form class="inline" method="post" action="{{ url_for('events.delete_event', event_id=e['id']) }}" data-confirm="Delete this event?"><input type="hidden" name="_csrf" value="{{ csrf_token() }}" /><button class="btn btn-danger btn-sm">Delete</button></form>{% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}<div class="card empty"><div class="big">📅</div>No {{ show }} events.</div>{% endif %}
+{% endblock %}

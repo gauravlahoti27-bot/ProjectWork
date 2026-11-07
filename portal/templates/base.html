@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+  <title>{% block title %}Alumni Nexus AI{% endblock %} · Alumni Nexus AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+</head>
+<body class="app">
+{% macro flashes() %}
+  <div class="flashes" role="status" aria-live="polite">
+    {% for cat, msg in get_flashed_messages(with_categories=true) %}
+      <div class="flash {{ cat }}"><span>{{ msg }}</span><button type="button" aria-label="Dismiss">×</button></div>
+    {% endfor %}
+  </div>
+{% endmacro %}
+{{ flashes() }}
+
+{% set ep = request.endpoint or '' %}
+{% macro nav(endpoint, icon, label, match=None) %}
+  <a class="side-link {{ 'active' if ep == endpoint or ep == match }}" href="{{ url_for(endpoint) }}"><span class="ic">{{ icon }}</span>{{ label }}</a>
+{% endmacro %}
+
+<div class="shell">
+  <aside class="sidebar" aria-label="Main navigation">
+    <a href="{{ url_for('home') }}" class="brand">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6.7 7.3 10.5 16M17.3 7.3 13.5 16M7 6h10"/></svg></span>
+      Alumni <span>Nexus</span>&nbsp;AI
+    </a>
+    {{ nav('users.dashboard', '🏠', 'Dashboard') }}
+    {{ nav('users.directory', '🎓', 'Alumni Directory', 'users.alumni_detail') }}
+    {{ nav('jobs.jobs_page', '💼', 'Jobs') }}
+    {{ nav('events.event_page', '📅', 'Events') }}
+    {{ nav('donations.donation', '💝', 'Give Back') }}
+    {{ nav('chatbot.chatbot', '🤖', 'AI Assistant') }}
+    {{ nav('users.profile', '👤', 'My Profile') }}
+    {% if g.user and g.user['role'] == 'admin' %}
+      <div class="side-sep">Admin</div>
+      {{ nav('admin.panel', '🛡️', 'Admin Panel') }}
+    {% endif %}
+    {% if g.user %}
+    <div class="side-user">
+      <div class="person"><span class="ava sm">{{ g.user['full_name']|initials }}</span>
+        <div class="person-meta"><strong>{{ g.user['full_name'] }}</strong><span class="dim">{{ g.user['role']|capitalize }}</span></div></div>
+      <form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}" /><button class="btn btn-ghost btn-sm btn-block">Log out</button></form>
+    </div>
+    {% endif %}
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" aria-label="Open menu">☰</button>
+      <a href="{{ url_for('home') }}" class="brand" style="font-size:16px">Alumni <span>Nexus</span>&nbsp;AI</a>
+      <span class="ava sm">{{ g.user['full_name']|initials if g.user else '?' }}</span>
+    </div>
+    <main class="content">{% block content %}{% endblock %}</main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
