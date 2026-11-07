@@ -1,0 +1,14 @@
+# Java / Maven
+**/target/
+
+# Python
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# IDE
+.idea/
